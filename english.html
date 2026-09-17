@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>English Literature Examination</title>
+<style>
+  :root{
+    --paper:#f6f3ec;
+    --ink:#1f2419;
+    --ink-soft:#4a4f42;
+    --rule:#c9c2ae;
+    --accent:#7a2e2e;
+    --accent-soft:#a9483f;
+    --good:#2f5d3a;
+    --good-bg:#e4ede3;
+    --bad:#7a2e2e;
+    --bad-bg:#f3e2df;
+    --card:#ffffff;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family: "Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    line-height:1.5;
+    min-height:100vh;
+  }
+  .wrap{max-width:760px;margin:0 auto;padding:28px 20px 80px;}
+
+  /* Header */
+  .masthead{
+    border-bottom:3px double var(--rule);
+    padding-bottom:14px;
+    margin-bottom:26px;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .masthead h1{
+    font-size:1.5rem;
+    margin:0;
+    letter-spacing:0.02em;
+    font-weight:600;
+  }
+  .masthead .sub{
+    font-size:0.85rem;
+    color:var(--ink-soft);
+    font-style:italic;
+  }
+  .timer-box{
+    font-variant-numeric:tabular-nums;
+    font-family: "Courier New", monospace;
+    font-size:1.4rem;
+    background:var(--ink);
+    color:var(--paper);
+    padding:8px 16px;
+    border-radius:2px;
+    min-width:104px;
+    text-align:center;
+  }
+  .timer-box.low{background:var(--accent);}
+
+  /* Start screen */
+  .start-card{
+    background:var(--card);
+    border:1px solid var(--rule);
+    padding:40px 32px;
+    margin-top:40px;
+    text-align:center;
+  }
+  .start-card h2{margin-top:0;font-size:1.2rem;letter-spacing:0.03em;}
+  .start-card p{color:var(--ink-soft);font-size:0.95rem;}
+  .name-field{
+    margin:24px 0;
+    text-align:left;
+  }
+  .name-field label{
+    display:block;
+    font-size:0.8rem;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:var(--ink-soft);
+    margin-bottom:6px;
+  }
+  .name-field input{
+    width:100%;
+    padding:12px 14px;
+    font-size:1.05rem;
+    font-family:inherit;
+    border:1px solid var(--rule);
+    background:var(--paper);
+    color:var(--ink);
+  }
+  .name-field input:focus{outline:2px solid var(--accent-soft);outline-offset:1px;}
+  .rules{
+    text-align:left;
+    font-size:0.85rem;
+    color:var(--ink-soft);
+    border-top:1px solid var(--rule);
+    padding-top:16px;
+    margin-top:20px;
+  }
+  .rules li{margin-bottom:4px;}
+
+  button{
+    font-family:inherit;
+    cursor:pointer;
+    border:none;
+  }
+  .btn-primary{
+    background:var(--accent);
+    color:#fff;
+    padding:13px 30px;
+    font-size:1rem;
+    letter-spacing:0.02em;
+  }
+  .btn-primary:hover{background:var(--accent-soft);}
+  .btn-primary:disabled{background:#b7ada0;cursor:not-allowed;}
+
+  /* Question nav grid */
+  .navgrid{
+    position:sticky;
+    top:0;
+    background:var(--paper);
+    padding:10px 0 14px;
+    z-index:5;
+    border-bottom:1px solid var(--rule);
+    margin-bottom:20px;
+  }
+  .navgrid-inner{
+    display:grid;
+    grid-template-columns:repeat(10,1fr);
+    gap:5px;
+  }
+  .navcell{
+    aspect-ratio:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:0.72rem;
+    border:1px solid var(--rule);
+    background:var(--card);
+    color:var(--ink-soft);
+    text-decoration:none;
+  }
+  .navcell.answered{background:var(--good-bg);border-color:var(--good);color:var(--good);}
+
+  /* Question cards */
+  .qcard{
+    background:var(--card);
+    border:1px solid var(--rule);
+    padding:20px 22px;
+    margin-bottom:16px;
+    scroll-margin-top:120px;
+  }
+  .qnum{
+    font-size:0.75rem;
+    text-transform:uppercase;
+    letter-spacing:0.1em;
+    color:var(--accent);
+    margin-bottom:6px;
+  }
+  .qtext{font-size:1.02rem;margin-bottom:14px;}
+  .opts{display:flex;flex-direction:column;gap:8px;}
+  .opt{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    padding:9px 12px;
+    border:1px solid var(--rule);
+    background:var(--paper);
+    cursor:pointer;
+  }
+  .opt:hover{border-color:var(--accent-soft);}
+  .opt.selected{
+    border-color:var(--accent);
+    background:#efe4e1;
+  }
+  .opt input{margin-top:3px;accent-color:var(--accent);}
+  .opt .lab{font-weight:600;margin-right:2px;}
+
+  .submit-bar{
+    position:sticky;
+    bottom:0;
+    background:var(--paper);
+    border-top:1px solid var(--rule);
+    padding:16px 0;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+  }
+  .progress-text{font-size:0.85rem;color:var(--ink-soft);}
+
+  /* Results */
+  .results-head{
+    background:var(--card);
+    border:1px solid var(--rule);
+    padding:26px 28px;
+    text-align:center;
+    margin-bottom:22px;
+  }
+  .results-head .name{font-size:1.1rem;font-weight:600;}
+  .score-big{
+    font-size:2.6rem;
+    color:var(--accent);
+    font-weight:700;
+    margin:8px 0 0;
+  }
+  .score-sub{color:var(--ink-soft);font-size:0.9rem;}
+
+  .review-item{
+    background:var(--card);
+    border:1px solid var(--rule);
+    padding:16px 20px;
+    margin-bottom:10px;
+  }
+  .review-item.correct{border-left:4px solid var(--good);}
+  .review-item.incorrect{border-left:4px solid var(--bad);}
+  .review-item.blank{border-left:4px solid var(--rule);}
+  .review-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    gap:10px;
+    margin-bottom:6px;
+  }
+  .review-q{font-size:0.95rem;}
+  .review-mark{
+    font-size:0.75rem;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    padding:2px 8px;
+    white-space:nowrap;
+  }
+  .review-mark.correct{background:var(--good-bg);color:var(--good);}
+  .review-mark.incorrect{background:var(--bad-bg);color:var(--bad);}
+  .review-mark.blank{background:#eee;color:var(--ink-soft);}
+  .review-ans{font-size:0.85rem;color:var(--ink-soft);}
+  .review-ans b{color:var(--ink);}
+
+  .filter-bar{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
+  .filter-btn{
+    padding:7px 14px;
+    font-size:0.8rem;
+    border:1px solid var(--rule);
+    background:var(--card);
+    color:var(--ink-soft);
+  }
+  .filter-btn.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+
+  .hidden{display:none !important;}
+  footer.note{text-align:center;color:var(--ink-soft);font-size:0.78rem;margin-top:30px;}
+
+  @media (max-width:480px){
+    .navgrid-inner{grid-template-columns:repeat(8,1fr);}
+    .masthead{flex-direction:column;align-items:flex-start;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ===== START SCREEN ===== -->
+  <div id="startScreen">
+    <div class="masthead">
+      <div>
+        <h1>English Literature Examination</h1>
+        <div class="sub">Prose &amp; Poetry &mdash; 60 Questions &middot; 60 Minutes</div>
+      </div>
+    </div>
+    <div class="start-card">
+      <h2>Before you begin</h2>
+      <p>Enter your name to start the test. The timer starts the moment you click Start.</p>
+      <div class="name-field">
+        <label for="studentName">Student Name</label>
+        <input type="text" id="studentName" placeholder="Type your full name" autocomplete="off">
+      </div>
+      <button class="btn-primary" id="startBtn">Start Test</button>
+      <ul class="rules">
+        <li>60 questions, 1 mark each. No negative marking.</li>
+        <li>Total time: 60 minutes. The test auto-submits when time runs out.</li>
+        <li>You can move between questions freely using the number grid.</li>
+        <li>Once submitted, you cannot change your answers.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ===== TEST SCREEN ===== -->
+  <div id="testScreen" class="hidden">
+    <div class="masthead">
+      <div>
+        <h1>English Literature Examination</h1>
+        <div class="sub" id="studentLabel"></div>
+      </div>
+      <div class="timer-box" id="timerBox">60:00</div>
+    </div>
+
+    <div class="navgrid">
+      <div class="navgrid-inner" id="navgridInner"></div>
+    </div>
+
+    <div id="questionList"></div>
+
+    <div class="submit-bar">
+      <span class="progress-text" id="progressText">0 / 50 answered</span>
+      <button class="btn-primary" id="submitBtn">Submit Test</button>
+    </div>
+  </div>
+
+  <!-- ===== RESULTS SCREEN ===== -->
+  <div id="resultsScreen" class="hidden">
+    <div class="results-head">
+      <div class="sub">Answer Sheet</div>
+      <div class="name" id="resultName"></div>
+      <div class="score-big" id="scoreBig"></div>
+      <div class="score-sub" id="scoreSub"></div>
+      <div class="score-sub" id="emailStatus" style="margin-top:8px;"></div>
+    </div>
+
+    <div class="filter-bar">
+      <button class="filter-btn active" data-filter="all">All 50</button>
+      <button class="filter-btn" data-filter="correct">Correct</button>
+      <button class="filter-btn" data-filter="incorrect">Incorrect</button>
+      <button class="filter-btn" data-filter="blank">Unanswered</button>
+    </div>
+
+    <div id="reviewList"></div>
+  </div>
+
+  <footer class="note">English Literature practice examination</footer>
+</div>
+
+<script>
+const QUESTIONS = [
+{q:"Why did Margie dislike the mechanical teacher particularly at the beginning of the story?",o:{A:"It never gave her homework",B:"It had been giving her geography tests that were too difficult",C:"It did not allow her to read books",D:"It frequently stopped working"},a:"B"},
+{q:"In The Road Not Taken, the two roads primarily represent:",o:{A:"Two geographical locations",B:"Two seasons of life",C:"Different choices or paths in life",D:"Two stages of education"},a:"C"},
+{q:"Why did Grandfather initially keep Toto's presence a secret?",o:{A:"Toto was dangerous",B:"Grandmother disliked animals and often fussed when new ones were brought home",C:"Toto belonged to someone else",D:"Toto was too expensive"},a:"B"},
+{q:"Evelyn Glennie's ability to perceive music mainly developed through:",o:{A:"Reading musical books",B:"Watching musicians perform",C:"Sensing vibrations through different parts of her body",D:"Learning music only through written notes"},a:"C"},
+{q:"What does the phrase “a yellow wood” in The Road Not Taken contribute to the poem?",o:{A:"It indicates a battlefield",B:"It establishes a natural setting in which the traveller must choose",C:"It represents a village market",D:"It describes a forest fire"},a:"B"},
+{q:"What was unusual about the school attended by Margie and Tommy's ancestors?",o:{A:"Children studied only at night",B:"All teachers were robots",C:"Children of the same age studied together in a separate school building",D:"Students learned only through telebooks"},a:"C"},
+{q:"Why was the shehnai traditionally associated with auspicious occasions?",o:{A:"It was very cheap",B:"Its sound was considered auspicious",C:"It could be played only in temples",D:"It was invented by priests"},a:"B"},
+{q:"What did the Happy Prince see from his high position that he had not understood while alive?",o:{A:"The beauty of distant countries",B:"The misery and suffering in his city",C:"The wealth of the merchants",D:"The life of the royal family"},a:"B"},
+{q:"Which statement best explains why Margie's mother called the County Inspector?",o:{A:"Margie refused to attend school",B:"The mechanical teacher was malfunctioning",C:"Margie's geography performance had declined",D:"Tommy had damaged the telebook"},a:"C"},
+{q:"Why did the little swallow initially hesitate to stay with the Happy Prince?",o:{A:"He disliked the city",B:"He wanted to return to Egypt",C:"He was afraid of the Prince",D:"He was looking for another bird"},a:"B"},
+{q:"In My Childhood, the new teacher objected when Kalam sat beside:",o:{A:"Sivasubramania Iyer",B:"Ramanadha Sastry",C:"Samsuddin",D:"Aravindan"},a:"B"},
+{q:"What finally happened to the old woman in A Legend of the Northland?",o:{A:"She became rich",B:"She was turned into a bird",C:"She became a saint",D:"She left the Northland"},a:"B"},
+{q:"Why did the County Inspector move Margie's geography sector backward?",o:{A:"It was too difficult",B:"It was too easy",C:"It was malfunctioning and giving her excessive homework",D:"Margie had forgotten the subject"},a:"B"},
+{q:"What does the poet hear at Innisfree that contributes to the peaceful atmosphere?",o:{A:"Bells and horns",B:"Crickets and lake water",C:"City traffic",D:"Temple drums"},a:"B"},
+{q:"Why did Grandfather take Toto with him to Saharanpur?",o:{A:"Toto was ill",B:"Toto could not sleep peacefully with the other pets and had to be taken along",C:"Grandmother ordered him to take Toto",D:"Toto wanted to visit a zoo"},a:"B"},
+{q:"What was Evelyn advised to use after her hearing loss was detected?",o:{A:"A hearing aid",B:"A violin",C:"A microphone",D:"A special keyboard"},a:"A"},
+{q:"The title The Fun They Had is ironic mainly because:",o:{A:"Margie and Tommy hate having fun",B:"Margie imagines that children in old schools enjoyed learning together",C:"Tommy never enjoys school",D:"The old school was completely boring"},a:"B"},
+{q:"Why did the old woman make the second and third cakes?",o:{A:"She wanted to feed many people",B:"She was trying to make the cakes smaller so that she could give one away without losing too much",C:"Saint Peter requested three cakes",D:"She was preparing them for a festival"},a:"B"},
+{q:"What was the main source of Margie's dislike for school?",o:{A:"Her classmates",B:"The mechanical teacher and repetitive testing",C:"The school building",D:"Her textbooks"},a:"B"},
+{q:"Which image in The Lake Isle of Innisfree most strongly suggests self-sufficient simple living?",o:{A:"Purple glow",B:"Nine bean-rows",C:"Grey pavement",D:"Noon"},a:"B"},
+{q:"What was the occupation of Kalam's father?",o:{A:"School teacher",B:"Boat owner who arranged boats for pilgrims",C:"Newspaper editor",D:"Shopkeeper"},a:"B"},
+{q:"Why did the Happy Prince ask the swallow to take his ruby?",o:{A:"To sell it in Egypt",B:"To decorate the palace",C:"To help a poor seamstress and her sick child",D:"To buy food for the swallow"},a:"C"},
+{q:"Which statement about the two roads in Frost's poem is most accurate?",o:{A:"One road was clearly superior",B:"Both roads appeared almost equally worn",C:"One road was completely unused",D:"The traveller returned and walked both"},a:"B"},
+{q:"What did Bismillah Khan learn to play from his maternal relatives?",o:{A:"Tabla",B:"Shehnai",C:"Sitar",D:"Sarod"},a:"B"},
+{q:"Why did the ticket collector demand three rupees from Grandfather?",o:{A:"He thought the monkey was a dog and charged the fare accordingly",B:"Toto destroyed the ticket",C:"Toto occupied two seats",D:"Grandfather had lost his ticket"},a:"A"},
+{q:"In My Childhood, which event most clearly challenged young Kalam's understanding of social equality?",o:{A:"His newspaper work",B:"The teacher asking him to sit on the back bench",C:"His father's advice",D:"His friendship with Samsuddin"},a:"B"},
+{q:"What happens to the Happy Prince's lead heart after his statue is melted?",o:{A:"It is melted into gold",B:"It remains un-melted and is thrown away",C:"It is given to the Mayor",D:"It disappears completely"},a:"B"},
+{q:"What does the speaker in The Lake Isle of Innisfree wish to build?",o:{A:"A large house",B:"A small cabin",C:"A temple",D:"A school"},a:"B"},
+{q:"Why did Evelyn choose percussion as an important field of study?",o:{A:"She disliked other instruments",B:"It allowed her to experience rhythm and sound through vibrations",C:"Her parents forced her",D:"It was the easiest instrument to learn"},a:"B"},
+{q:"Why does Margie think that children in the old school must have enjoyed themselves?",o:{A:"They did not study anything",B:"They could learn together, share experiences and have a human teacher",C:"They received no homework",D:"They used only computers"},a:"B"},
+{q:"Which detail best shows Toto's exceptional mischievousness?",o:{A:"He slept peacefully with other animals",B:"He tore wallpaper, clothes and household objects",C:"He avoided food",D:"He disliked bathing"},a:"B"},
+{q:"What was the old woman's fundamental flaw in A Legend of the Northland?",o:{A:"Laziness",B:"Fear",C:"Greed and selfishness",D:"Ignorance"},a:"C"},
+{q:"Why did Bismillah Khan refuse the idea of settling permanently in the United States?",o:{A:"He disliked travelling",B:"He could not imagine leaving Benaras, the Ganga and his cultural roots",C:"He did not know English",D:"He wanted to stop playing music"},a:"B"},
+{q:"What does the final line of The Road Not Taken suggest?",o:{A:"Choices can shape how a person remembers life",B:"The traveller regrets entering the forest",C:"The two roads physically changed",D:"The speaker will return immediately"},a:"A"},
+{q:"Who repaired Margie's mechanical teacher?",o:{A:"Tommy",B:"Her mother",C:"The County Inspector",D:"Her grandfather"},a:"C"},
+{q:"What did the Happy Prince ask the swallow to do after both of his sapphires were gone?",o:{A:"Leave the city",B:"Take the gold covering from his body and distribute it among the poor",C:"Bring jewels from Egypt",D:"Find his lost ruby"},a:"B"},
+{q:"In My Childhood, Kalam's father most strongly represents:",o:{A:"Wealth and political authority",B:"Simplicity, wisdom and spiritual strength",C:"Military discipline",D:"Academic competition"},a:"B"},
+{q:"Why does the swallow ultimately remain with the Happy Prince?",o:{A:"He forgets the route to Egypt",B:"He develops affection for the Prince and cannot leave him in suffering",C:"Egypt becomes inaccessible",D:"The Prince promises him wealth"},a:"B"},
+{q:"What transformation occurs in A Legend of the Northland as punishment?",o:{A:"The woman becomes a sparrow",B:"The woman becomes a woodpecker condemned to bore for food",C:"The woman becomes a tree",D:"The woman becomes a fish"},a:"B"},
+{q:"Which phrase from The Lake Isle of Innisfree most directly conveys the poet's desire for continuous peace?",o:{A:"“purple glow”",B:"“for peace comes dropping slow”",C:"“roadway or the pavements grey”",D:"“bee-loud glade”"},a:"B"},
+{q:"What was special about the old school that Tommy described?",o:{A:"It was entirely virtual",B:"It had a human teacher and students who gathered together",C:"It had no books",D:"It used only mechanical teachers"},a:"B"},
+{q:"Why did Toto's bath become dangerous?",o:{A:"He slipped into the river",B:"He climbed into a kettle whose water later began to boil",C:"He fell into a pond",D:"Nana pushed him into the water"},a:"B"},
+{q:"What is significant about the word “sigh” in the final stanza of The Road Not Taken?",o:{A:"It gives the poem a completely cheerful ending",B:"It suggests the speaker's reflective and possibly ambiguous attitude toward his past choice",C:"It proves the speaker made the wrong decision",D:"It means the road was physically difficult"},a:"B"},
+{q:"What was one important reason for the enduring importance of Bismillah Khan's shehnai?",o:{A:"He transformed it into a respected classical musical instrument",B:"He replaced it with the violin",C:"He played only for royalty",D:"He used it exclusively in Western concerts"},a:"A"},
+{q:"Which contrast is central to The Happy Prince?",o:{A:"Nature versus science",B:"Wealth and outward beauty versus suffering and compassion",C:"Youth versus education",D:"Village versus city"},a:"B"},
+{q:"In My Childhood, why did Lakshmana Sastry strongly protest the teacher's behaviour?",o:{A:"He wanted Kalam to change schools",B:"He opposed social discrimination and communal prejudice",C:"He wanted to become a teacher",D:"He disliked Ramanadha Sastry"},a:"B"},
+{q:"Which combination correctly represents the poet's imagined life at Innisfree?",o:{A:"A palace, gardens and servants",B:"A cabin, bean-rows, bees and peaceful surroundings",C:"A city apartment and traffic",D:"A school, playground and library"},a:"B"},
+{q:"What does Margie's experience suggest about excessive dependence on mechanical teaching?",o:{A:"It can make learning feel isolated and impersonal",B:"It always makes students more social",C:"It eliminates the need for understanding",D:"It makes teachers unnecessary in every situation"},a:"A"},
+{q:"Why does the Happy Prince become “dull and grey”?",o:{A:"Rain damages him",B:"The Mayor paints him grey",C:"His gold is removed and given to poor people",D:"The statue is burned"},a:"C"},
+{q:"Why did the narrator's family eventually sell Toto back to the tonga-driver?",o:{A:"Toto became ill",B:"Toto was too expensive and destructive to keep as a pet",C:"Grandfather lost interest in him",D:"Grandmother demanded money for him"},a:"B"},
+{q:"What does the image of the “bee-loud glade” mainly evoke?",o:{A:"Silence and emptiness",B:"Natural activity and peaceful rural life",C:"Urban noise",D:"Danger in the forest"},a:"B"},
+{q:"Why was Kalam's newspaper work during the Second World War significant to him?",o:{A:"It gave him his first earning experience",B:"It made him famous",C:"It helped him become a teacher",D:"It ended the war"},a:"A"},
+{q:"Which statement best captures the role of the swallow in The Happy Prince?",o:{A:"He remains concerned mainly with his own comfort",B:"He becomes an agent of the Prince's compassion",C:"He is a messenger of the Mayor",D:"He destroys the statue"},a:"B"},
+{q:"Why does Saint Peter become angry with the old woman?",o:{A:"She refuses to give him enough food despite having food available",B:"She insults him publicly",C:"She refuses to let him enter the cottage",D:"She breaks his staff"},a:"A"},
+{q:"Which statement about Evelyn is supported by the chapter?",o:{A:"She stopped performing after losing her hearing",B:"She became a successful percussionist despite severe hearing difficulty",C:"She could hear normally throughout her career",D:"She avoided public performances"},a:"B"},
+{q:"What does the contrast between Margie's school and the old school mainly highlight?",o:{A:"The superiority of machines in every situation",B:"Different ways of understanding education and human interaction",C:"The importance of homework only",D:"The uselessness of teachers"},a:"B"},
+{q:"What happens to the swallow at the end of The Happy Prince?",o:{A:"He reaches Egypt safely",B:"He dies from the cold after remaining with the Prince",C:"He returns to his friends",D:"He becomes part of the statue"},a:"B"},
+{q:"Which event in My Childhood best demonstrates the positive effect of personal example?",o:{A:"The newspaper delivery",B:"Sivasubramania Iyer's determination to overcome social barriers by serving Kalam himself",C:"The teacher asking Kalam to move",D:"The outbreak of war"},a:"B"},
+{q:"In The Road Not Taken, why is the traveller unable to travel both roads?",o:{A:"One road is blocked",B:"He is only one traveller and must choose one direction",C:"The weather changes",D:"He gets lost"},a:"B"},
+{q:"Which pair is correctly matched?",o:{A:"A Legend of the Northland — Saint Peter and the selfish old woman",B:"The Lake Isle of Innisfree — a crowded marketplace",C:"The Fun They Had — Bismillah Khan",D:"The Happy Prince — Toto's railway journey"},a:"A"}
+];
+
+const TEACHER_EMAIL = "abusalehziarulhussain@gmail.com";
+const TOTAL_SECONDS = 60 * 60;
+let studentName = "";
+let answers = new Array(QUESTIONS.length).fill(null);
+let timeLeft = TOTAL_SECONDS;
+let timerHandle = null;
+let submitted = false;
+
+const startScreen = document.getElementById('startScreen');
+const testScreen = document.getElementById('testScreen');
+const resultsScreen = document.getElementById('resultsScreen');
+
+document.getElementById('startBtn').addEventListener('click', () => {
+  const nameInput = document.getElementById('studentName');
+  const name = nameInput.value.trim();
+  if (!name) {
+    nameInput.style.borderColor = '#7a2e2e';
+    nameInput.focus();
+    return;
+  }
+  studentName = name;
+  startTest();
+});
+
+function startTest(){
+  startScreen.classList.add('hidden');
+  testScreen.classList.remove('hidden');
+  document.getElementById('studentLabel').textContent = 'Candidate: ' + studentName;
+  buildNavGrid();
+  buildQuestions();
+  updateProgress();
+  timerHandle = setInterval(tick, 1000);
+}
+
+function tick(){
+  timeLeft--;
+  if (timeLeft <= 0){
+    timeLeft = 0;
+    renderTimer();
+    clearInterval(timerHandle);
+    finishTest(true);
+    return;
+  }
+  renderTimer();
+}
+
+function renderTimer(){
+  const m = Math.floor(timeLeft/60).toString().padStart(2,'0');
+  const s = (timeLeft%60).toString().padStart(2,'0');
+  const box = document.getElementById('timerBox');
+  box.textContent = m + ':' + s;
+  box.classList.toggle('low', timeLeft <= 300);
+}
+renderTimer();
+
+function buildNavGrid(){
+  const grid = document.getElementById('navgridInner');
+  grid.innerHTML = '';
+  QUESTIONS.forEach((_, i) => {
+    const a = document.createElement('a');
+    a.href = '#q' + (i+1);
+    a.className = 'navcell';
+    a.id = 'nav' + i;
+    a.textContent = (i+1);
+    grid.appendChild(a);
+  });
+}
+
+function buildQuestions(){
+  const list = document.getElementById('questionList');
+  list.innerHTML = '';
+  QUESTIONS.forEach((item, i) => {
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.id = 'q' + (i+1);
+
+    const num = document.createElement('div');
+    num.className = 'qnum';
+    num.textContent = 'Question ' + (i+1) + ' of ' + QUESTIONS.length;
+    card.appendChild(num);
+
+    const qt = document.createElement('div');
+    qt.className = 'qtext';
+    qt.textContent = item.q;
+    card.appendChild(qt);
+
+    const opts = document.createElement('div');
+    opts.className = 'opts';
+    ['A','B','C','D'].forEach(letter => {
+      const optLabel = document.createElement('label');
+      optLabel.className = 'opt';
+      optLabel.id = 'opt' + i + letter;
+
+      const radio = document.createElement('input');
+      radio.type = 'radio';
+      radio.name = 'q' + i;
+      radio.value = letter;
+      radio.addEventListener('change', () => selectAnswer(i, letter));
+
+      const span = document.createElement('span');
+      span.innerHTML = '<span class="lab">' + letter + '.</span> ' + item.o[letter];
+
+      optLabel.appendChild(radio);
+      optLabel.appendChild(span);
+      opts.appendChild(optLabel);
+    });
+    card.appendChild(opts);
+    list.appendChild(card);
+  });
+}
+
+function selectAnswer(qIndex, letter){
+  answers[qIndex] = letter;
+  ['A','B','C','D'].forEach(l => {
+    document.getElementById('opt' + qIndex + l).classList.toggle('selected', l === letter);
+  });
+  document.getElementById('nav' + qIndex).classList.add('answered');
+  updateProgress();
+}
+
+function updateProgress(){
+  const answered = answers.filter(a => a !== null).length;
+  document.getElementById('progressText').textContent = answered + ' / ' + QUESTIONS.length + ' answered';
+}
+
+document.getElementById('submitBtn').addEventListener('click', () => {
+  const answered = answers.filter(a => a !== null).length;
+  if (answered < QUESTIONS.length){
+    const ok = confirm('You have answered ' + answered + ' of ' + QUESTIONS.length + ' questions. Submit anyway?');
+    if (!ok) return;
+  }
+  finishTest(false);
+});
+
+function finishTest(auto){
+  if (submitted) return;
+  submitted = true;
+  clearInterval(timerHandle);
+  testScreen.classList.add('hidden');
+  resultsScreen.classList.remove('hidden');
+  renderResults(auto);
+}
+
+function renderResults(auto){
+  let score = 0;
+  QUESTIONS.forEach((item, i) => {
+    if (answers[i] === item.a) score++;
+  });
+
+  document.getElementById('resultName').textContent = studentName;
+  document.getElementById('scoreBig').textContent = score + ' / ' + QUESTIONS.length;
+  const timeUsed = TOTAL_SECONDS - timeLeft;
+  const mUsed = Math.floor(timeUsed/60);
+  const sUsed = timeUsed%60;
+  document.getElementById('scoreSub').textContent =
+    (auto ? 'Time expired \u2014 auto-submitted. ' : 'Submitted. ') +
+    'Time used: ' + mUsed + ' min ' + sUsed + ' sec.';
+
+  const reviewList = document.getElementById('reviewList');
+  reviewList.innerHTML = '';
+
+  QUESTIONS.forEach((item, i) => {
+    const selected = answers[i];
+    const isBlank = selected === null;
+    const isCorrect = selected === item.a;
+    const status = isBlank ? 'blank' : (isCorrect ? 'correct' : 'incorrect');
+
+    const div = document.createElement('div');
+    div.className = 'review-item ' + status;
+    div.dataset.status = status;
+
+    const top = document.createElement('div');
+    top.className = 'review-top';
+    const qspan = document.createElement('div');
+    qspan.className = 'review-q';
+    qspan.textContent = (i+1) + '. ' + item.q;
+    const mark = document.createElement('div');
+    mark.className = 'review-mark ' + status;
+    mark.textContent = isBlank ? 'Unanswered \u00b7 0' : (isCorrect ? 'Correct \u00b7 1' : 'Incorrect \u00b7 0');
+    top.appendChild(qspan);
+    top.appendChild(mark);
+    div.appendChild(top);
+
+    const ans = document.createElement('div');
+    ans.className = 'review-ans';
+    const studentAnsText = isBlank ? 'No answer selected' : (selected + '. ' + item.o[selected]);
+    ans.innerHTML = 'Student\u2019s answer: <b>' + studentAnsText + '</b>' +
+      (isCorrect ? '' : '<br>Correct answer: <b>' + item.a + '. ' + item.o[item.a] + '</b>');
+    div.appendChild(ans);
+
+    reviewList.appendChild(div);
+  });
+
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const f = btn.dataset.filter;
+      document.querySelectorAll('.review-item').forEach(item => {
+        item.classList.toggle('hidden', f !== 'all' && item.dataset.status !== f);
+      });
+    });
+  });
+
+  sendResultsEmail(score, timeUsed, auto);
+}
+
+function sendResultsEmail(score, timeUsed, auto){
+  const statusEl = document.getElementById('emailStatus');
+  statusEl.textContent = 'Sending result to teacher\u2026';
+
+  const mUsed = Math.floor(timeUsed/60);
+  const sUsed = timeUsed%60;
+
+  let answerLines = '';
+  QUESTIONS.forEach((item, i) => {
+    const selected = answers[i];
+    const isBlank = selected === null;
+    const isCorrect = selected === item.a;
+    const status = isBlank ? 'BLANK' : (isCorrect ? 'CORRECT' : 'WRONG');
+    const studentAnsText = isBlank ? '-' : (selected + '. ' + item.o[selected]);
+    answerLines += (i+1) + '. [' + status + '] Student chose: ' + studentAnsText +
+      (isCorrect ? '' : '  |  Correct: ' + item.a + '. ' + item.o[item.a]) + '\n';
+  });
+
+  const payload = {
+    _subject: 'Exam result: ' + studentName + ' (' + score + '/' + QUESTIONS.length + ')',
+    Student_Name: studentName,
+    Score: score + ' out of ' + QUESTIONS.length,
+    Time_Used: mUsed + ' min ' + sUsed + ' sec' + (auto ? ' (auto-submitted, time expired)' : ''),
+    Submitted_At: new Date().toString(),
+    Full_Answer_Sheet: answerLines,
+    _template: 'table'
+  };
+
+  fetch('https://formsubmit.co/ajax/' + encodeURIComponent(TEACHER_EMAIL), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  .then(res => res.json())
+  .then(() => {
+    statusEl.textContent = 'Result sent to teacher.';
+  })
+  .catch(() => {
+    statusEl.textContent = 'Could not send automatically \u2014 please show this screen to your teacher or screenshot it.';
+  });
+}
+</script>
+</body>
+</html>
